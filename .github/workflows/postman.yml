@@ -20,6 +20,10 @@ jobs:
         if: ${{ failure() }}
         run: |
           echo "Bug Detected: skip=-1 should return 400 but returned ${failure()}" >> bug_log.txt
+          echo "Bug Detected: Add a new post without title should return 400 but returned ${failure()}" >> bug_log.txt
+          echo "Bug Detected: Add a new post without body should return 400 but returned ${failure()}" >> bug_log.txt
+          echo "Bug Detected: Title exceeds max length in add a new posts hould return 400 but returned ${failure()}" >> bug_log.txt
+          echo "Bug Detected: Title exceeds max length in update post should return 400 but returned ${failure()}" >> bug_log.txt
           echo "Test failed for the following reason: ${{ steps.postman_tests.outcome }}" >> bug_log.txt    
       - name: Upload bug log artifact
         if: ${{ failure() }}
