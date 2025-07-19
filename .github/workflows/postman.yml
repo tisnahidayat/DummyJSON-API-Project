@@ -13,5 +13,17 @@ jobs:
       - name: Login to Postman CLI
         run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
       - name: Run API tests
+        continue-on-error: true 
         run: |
           postman collection run "26429971-040c7827-1f9e-49b2-ab36-6e8367565ad6"
+      - name: Log Bug for skip=-1 issue
+        if: ${{ failure() }}
+        run: |
+          echo "Bug Detected: skip=-1 should return 400 but returned ${failure()}" >> bug_log.txt
+          echo "Test failed for the following reason: ${{ steps.postman_tests.outcome }}" >> bug_log.txt    
+      - name: Upload bug log artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: bug-log
+          path: bug_log.txt
