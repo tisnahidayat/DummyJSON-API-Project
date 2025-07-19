@@ -23,7 +23,8 @@ jobs:
           echo "Test failed for the following reason: ${{ steps.postman_tests.outcome }}" >> bug_log.txt    
       - name: Upload bug log artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3  # Ganti v2 dengan v3
         with:
           name: bug-log
           path: bug_log.txt
+
