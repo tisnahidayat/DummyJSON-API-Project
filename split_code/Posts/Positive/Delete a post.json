@@ -1,0 +1,112 @@
+{
+  "name": "Delete a post",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "const Ajv = require('ajv');\r",
+          "const ajv = new Ajv();\r",
+          "const jsonData = pm.response.json();\r",
+          "\r",
+          "const deleteSchema = {\r",
+          "    type: 'object',\r",
+          "    properties: {\r",
+          "        id: { type: 'number' },\r",
+          "        title: { type: 'string' },\r",
+          "        body: {type: 'string' },\r",
+          "        tags: { type: 'array', items: { type: 'string' } },\r",
+          "        reactions: {\r",
+          "            type: 'object',\r",
+          "            properties: {\r",
+          "                likes: { type: 'number' },\r",
+          "                dislikes: { type: 'number' }\r",
+          "            },\r",
+          "            required: ['likes', 'dislikes'],\r",
+          "            additionalProperties: false\r",
+          "        },\r",
+          "        views: { type: 'number' },\r",
+          "        userId: { type: 'number' },\r",
+          "        isDeleted: { type: 'boolean' },\r",
+          "        deletedOn: { type: 'string', format: 'date-time' }\r",
+          "        },\r",
+          "    required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId', 'isDeleted', 'deletedOn'],\r",
+          "    additionalProperties: false\r",
+          "};\r",
+          "\r",
+          "const postId = JSON.parse(pm.collectionVariables.get(\"postId\"));\r",
+          "const posts = JSON.parse(pm.collectionVariables.get(\"allPosts\"));\r",
+          "const validate = ajv.compile(deleteSchema);\r",
+          "\r",
+          "\r",
+          "pm.test(\"Status code is 200\", () => {\r",
+          "    pm.response.to.have.status(200);\r",
+          "});\r",
+          "\r",
+          "pm.test('Content-Type is application/json', () => {\r",
+          "  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+          "});\r",
+          "\r",
+          "pm.test('Response is valid JSON', () => {\r",
+          "  pm.expect(() => pm.response.json()).to.not.throw();\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Check if the post is deleted\", () => {\r",
+          "    const valid = validate(jsonData)\r",
+          "    if(!valid) {\r",
+          "        console.log(validate.errors);\r",
+          "    }\r",
+          "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response containts required properties\", () => {\r",
+          "    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId', 'isDeleted', 'deletedOn'];\r",
+          "    props.forEach((data) => pm.expect(jsonData).to.have.property(data))\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response values as expected\", () => {\r",
+          "    pm.expect(jsonData.id).to.eql(posts[postId - 1].id);\r",
+          "    pm.expect(jsonData.title).to.eql(posts[postId -1].title);\r",
+          "    pm.expect(jsonData.body).to.eql(posts[postId - 1].body);\r",
+          "    pm.expect(jsonData.userId).to.eql(posts[postId -1 ].userId);\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response time is under 200ms\", () => {\r",
+          "    pm.expect(pm.response.responseTime).to.below(300);\r",
+          "});"
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    }
+  ],
+  "request": {
+    "method": "DELETE",
+    "header": [],
+    "body": {
+      "mode": "raw",
+      "raw": "",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      }
+    },
+    "url": {
+      "raw": "{{baseUrl}}posts/:id",
+      "host": [
+        "{{baseUrl}}posts"
+      ],
+      "path": [
+        ":id"
+      ],
+      "variable": [
+        {
+          "key": "id",
+          "value": "{{postId}}"
+        }
+      ]
+    }
+  },
+  "response": []
+}

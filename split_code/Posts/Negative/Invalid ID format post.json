@@ -1,0 +1,63 @@
+{
+  "name": "Invalid ID format post",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "const jsonData = pm.response.json();\r",
+          "\r",
+          "pm.test(\"Status code is 400\", () => {\r",
+          "    pm.response.to.have.status(400)\r",
+          "});\r",
+          "\r",
+          "pm.test('Content-Type is application/json', () => {\r",
+          "  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+          "});\r",
+          "\r",
+          "pm.test('Response is valid JSON', () => {\r",
+          "  pm.expect(() => pm.response.json()).to.not.throw();\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response schema should match the expected format\", () => {\r",
+          "    pm.expect(jsonData).to.have.property('message');\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response values as expected\", () => {\r",
+          "    pm.expect(jsonData.message).to.eql(\"Invalid post id 'abc'\");\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response time is under 200ms\", () => {\r",
+          "    pm.expect(pm.response.responseTime).to.below(300);\r",
+          "})\r",
+          ""
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    }
+  ],
+  "request": {
+    "method": "DELETE",
+    "header": [],
+    "body": {
+      "mode": "raw",
+      "raw": "",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      }
+    },
+    "url": {
+      "raw": "{{baseUrl}}posts/abc",
+      "host": [
+        "{{baseUrl}}posts"
+      ],
+      "path": [
+        "abc"
+      ]
+    }
+  },
+  "response": []
+}

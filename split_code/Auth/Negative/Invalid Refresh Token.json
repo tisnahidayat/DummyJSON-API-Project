@@ -1,0 +1,103 @@
+{
+  "name": "Invalid Refresh Token",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "const Ajv = require('ajv');\r",
+          "const ajv = new Ajv();\r",
+          "const jsonData = pm.response.json();\r",
+          "\r",
+          "const errorSchema = {\r",
+          "    type: \"object\",\r",
+          "    properties: {\r",
+          "        message: {\r",
+          "            type: \"string\"\r",
+          "        }\r",
+          "    }\r",
+          "}\r",
+          "const validate = ajv.compile(errorSchema);\r",
+          "\r",
+          "pm.test(\"Status code is 401\", () => {\r",
+          "    pm.response.to.have.status(401);\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Content-Type is application/json\", () => {\r",
+          "    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response is valid JSON\", () => {\r",
+          "    pm.expect(() => pm.response.json()).to.not.throw();\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response schema should match the expected format\", () => {\r",
+          "    const valid = validate(jsonData);\r",
+          "    if (!valid) {\r",
+          "        console.error(validate.errors);\r",
+          "    };\r",
+          "\r",
+          "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response contains required properties\", () => {\r",
+          "    pm.expect(jsonData).to.have.property(\"message\")\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response values are as expected\", () => {\r",
+          "    pm.expect(jsonData.message).to.include(\"Refresh token required\");\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response time is under 1000ms\", () => {\r",
+          "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+          "});\r",
+          ""
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    },
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "const token = pm.collectionVariables.get(\"invalidToken\")\r",
+          "\r",
+          "pm.request.headers.add({\r",
+          "    key: \"Authorization\",\r",
+          "    value: `Bearer ${token}`\r",
+          "});\r",
+          ""
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    }
+  ],
+  "request": {
+    "auth": {
+      "type": "noauth"
+    },
+    "method": "POST",
+    "header": [],
+    "body": {
+      "mode": "raw",
+      "raw": "",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      }
+    },
+    "url": {
+      "raw": "{{baseUrl}}auth/refresh",
+      "host": [
+        "{{baseUrl}}auth"
+      ],
+      "path": [
+        "refresh"
+      ]
+    }
+  },
+  "response": []
+}

@@ -1,0 +1,45 @@
+{
+  "name": "Invalid skip param negative",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "const Ajv = require('ajv');\r",
+          "const ajv = new Ajv();\r",
+          "\r",
+          "pm.test('API should return 400 when skip is negative', function () {\r",
+          "  pm.response.to.have.status(400); \r",
+          "  pm.response.to.have.body('Invalid query parameter: skip should not be negative');\r",
+          "});\r",
+          "\r",
+          ""
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    }
+  ],
+  "request": {
+    "method": "GET",
+    "header": [],
+    "url": {
+      "raw": "{{baseUrl}}posts?skip=-1",
+      "host": [
+        "{{baseUrl}}posts"
+      ],
+      "query": [
+        {
+          "key": "skip",
+          "value": "-1"
+        },
+        {
+          "key": "limit",
+          "value": "1000",
+          "disabled": true
+        }
+      ]
+    }
+  },
+  "response": []
+}
