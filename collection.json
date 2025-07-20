@@ -1,0 +1,4132 @@
+{
+	"info": {
+		"_postman_id": "040c7827-1f9e-49b2-ab36-6e8367565ad6",
+		"name": "DummyJSON",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26429971"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Positive",
+					"item": [
+						{
+							"name": "Valid Credentials",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"const schema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        accessToken: { type: \"string\" },\r",
+											"        refreshToken: { type: \"string\" },\r",
+											"        id: { type: \"integer\" },\r",
+											"        username: { type: \"string\" },\r",
+											"        email: {\r",
+											"            type: \"string\",\r",
+											"            pattern: \"^[\\\\w.-]+@[\\\\w.-]+\\\\.\\\\w+$\"\r",
+											"        },\r",
+											"        firstName: { type: \"string\" },\r",
+											"        lastName: { type: \"string\" },\r",
+											"        gender: {\r",
+											"            type: \"string\",\r",
+											"            enum: [\"male\", \"female\"]\r",
+											"        },\r",
+											"        image: { type: \"string\" }\r",
+											"    },\r",
+											"    required: [\"accessToken\", \"refreshToken\", \"id\", \"username\", \"email\", \"lastName\", \"gender\", \"image\"],\r",
+											"    additionalProperties: false\r",
+											"};\r",
+											"\r",
+											"const validate = ajv.compile(schema);\r",
+											"\r",
+											"pm.collectionVariables.set(\"userLogin\", JSON.stringify(jsonData));\r",
+											"const userLoginData = JSON.parse(pm.collectionVariables.get(\"userLogin\"));\r",
+											"\r",
+											"// Basic Response Validations\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"// Schema & Property Checks\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.log(\"Schema validation errors:\", validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors, null, 2)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    const props = [\r",
+											"        \"accessToken\", \"refreshToken\", \"id\", \"username\",\r",
+											"        \"email\", \"firstName\", \"lastName\", \"gender\", \"image\"\r",
+											"    ];\r",
+											"    props.forEach(prop => {\r",
+											"        pm.expect(jsonData).to.have.property(prop);\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.accessToken).to.eql(userLoginData.accessToken);\r",
+											"    pm.expect(jsonData.refreshToken).to.eql(userLoginData.refreshToken);\r",
+											"    pm.expect(jsonData.id).to.eql(userLoginData.id);\r",
+											"    pm.expect(jsonData.username).to.eql(userLoginData.username);\r",
+											"    pm.expect(jsonData.email).to.eql(userLoginData.email);\r",
+											"    pm.expect(jsonData.firstName).to.eql(userLoginData.firstName);\r",
+											"    pm.expect(jsonData.lastName).to.eql(userLoginData.lastName);\r",
+											"    pm.expect(jsonData.gender).to.eql(userLoginData.gender);\r",
+											"    pm.expect(jsonData.image).to.include(userLoginData.image);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Token fields should be strings\", () => {\r",
+											"    pm.expect(jsonData.accessToken).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.refreshToken).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"User fields should have correct types\", () => {\r",
+											"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+											"    pm.expect(jsonData.username).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.email).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.firstName).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.lastName).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.gender).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.image).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"sophiab\",\r\n    \"password\": \"sophiabpass\",\r\n    \"expiresInMins\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Valid Auth Me",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const token = JSON.parse(pm.collectionVariables.get(\"userLogin\"))\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: `Bearer ${token.accessToken}`\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const userSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"number\"\r",
+											"        },\r",
+											"        username: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        password: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        email: {\r",
+											"            type: \"string\",\r",
+											"            pattern: \"^[\\\\w.-]+@[\\\\w.-]+\\\\.\\\\w+$\"\r",
+											"        },\r",
+											"        phone: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        gender: {\r",
+											"            type: \"string\",\r",
+											"            enum: ['male', 'female']\r",
+											"        },\r",
+											"        birthDate: {\r",
+											"            type: \"string\",\r",
+											"        },\r",
+											"        role: {\r",
+											"            type: \"string\"\r",
+											"        }\r",
+											"    },\r",
+											"    required: ['id', 'username', 'password', 'email', 'phone', 'gender', 'birthDate', \"role\"]\r",
+											"}\r",
+											"const validate = ajv.compile(userSchema);\r",
+											"\r",
+											"pm.collectionVariables.set(\"userPartial\", JSON.stringify(jsonData))\r",
+											"\r",
+											"const user = JSON.parse(pm.collectionVariables.get('userPartial'));\r",
+											"\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    const props = ['id', 'username', 'password', 'gender', 'email', 'phone', 'birthDate'];\r",
+											"\r",
+											"    props.forEach((data) => pm.expect(jsonData).to.have.property(data))\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.id).to.eql(user.id);\r",
+											"    pm.expect(jsonData.username).to.eql(user.username);\r",
+											"    pm.expect(jsonData.password).to.eql(user.password);\r",
+											"    pm.expect(jsonData.gender).to.eql(user.gender);\r",
+											"    pm.expect(jsonData.phone).to.include(user.phone);\r",
+											"    pm.expect(jsonData.birthDate).to.include(user.birthDate);\r",
+											"    pm.expect(jsonData.role).to.eql(user.role);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}auth/me",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh auth session",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const userSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        accessToken: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        refreshToken: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: ['accessToken', 'refreshToken'],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"const validate = ajv.compile(userSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    pm.expect(jsonData).to.have.property('accessToken');\r",
+											"    pm.expect(jsonData).to.have.property('refreshToken');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 100ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{refreshToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}auth/refresh",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Negative",
+					"item": [
+						{
+							"name": "Empty Username and Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: [\"message\"],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.lod(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has message property\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Username and password required\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Empty Username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: [\"message\"],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.lod(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has message property\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Username and password required\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"\",\r\n    \"password\": \"emilyspass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Empty Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: [\"message\"],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.lod(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has message property\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Username and password required\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: [\"message\"],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.lod(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has message property\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid credentials\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"emily\",\r\n    \"password\": \"emilyspass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: [\"message\"],\r",
+											"    additionalProperties: false\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.lod(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has message property\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error message is as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid credentials\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspas\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/login",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const token = pm.collectionVariables.get(\"invalidToken\")\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: `Bearer ${token}`\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        }\r",
+											"    }\r",
+											"}\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 401\", () => {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"Invalid\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 100ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(100);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}auth/me",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Expired Token",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const token = pm.collectionVariables.get(\"invalidToken\")\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: `Bearer ${token}`\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        }\r",
+											"    }\r",
+											"}\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 401\", () => {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"Expired\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}auth/me",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh Token without cookies",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        }\r",
+											"    }\r",
+											"}\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 401\", () => {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"Refresh token required\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/refresh",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid Refresh Token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const errorSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        message: {\r",
+											"            type: \"string\"\r",
+											"        }\r",
+											"    }\r",
+											"}\r",
+											"const validate = ajv.compile(errorSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 401\", () => {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Content-Type is application/json\", () => {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is valid JSON\", () => {\r",
+											"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData);\r",
+											"    if (!valid) {\r",
+											"        console.error(validate.errors);\r",
+											"    };\r",
+											"\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values are as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"Refresh token required\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const token = pm.collectionVariables.get(\"invalidToken\")\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: `Bearer ${token}`\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}auth/refresh",
+									"host": [
+										"{{baseUrl}}auth"
+									],
+									"path": [
+										"refresh"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Positive",
+					"item": [
+						{
+							"name": "Get all posts without params",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const postData = JSON.parse(pm.collectionVariables.get('allPosts'));\r",
+											"\r",
+											"const validate = ajv.compile(postsSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"    pm.expect(jsonData.posts.length, 'No posts available').to.be.greaterThan(0);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].id).to.eql(postData[0].id);\r",
+											"    pm.expect(jsonData.posts[0].title).to.eql(postData[0].title);\r",
+											"    pm.expect(jsonData.posts[0].body).to.eql(postData[0].body);\r",
+											"    pm.expect(jsonData.posts[0].tags).to.eql(postData[0].tags);\r",
+											"    pm.expect(jsonData.posts[0].reactions.likes).to.eql(postData[0].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[0].reactions.dislikes).to.eql(postData[0].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[0].views).to.eql(postData[0].views);\r",
+											"    pm.expect(jsonData.posts[0].userId).to.eql(postData[0].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 1000ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "select",
+											"value": "title,body",
+											"disabled": true
+										},
+										{
+											"key": "skip",
+											"value": "10000",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "10000",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get posts with limit & skip",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const postData = JSON.parse(pm.collectionVariables.get('allPosts'));\r",
+											"\r",
+											"const validate = ajv.compile(postsSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"    pm.expect(jsonData.posts.length, 'No posts available').to.be.greaterThan(0);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[100].id).to.eql(postData[100].id);\r",
+											"    pm.expect(jsonData.posts[100].title).to.eql(postData[100].title);\r",
+											"    pm.expect(jsonData.posts[100].body).to.eql(postData[100].body);\r",
+											"    pm.expect(jsonData.posts[100].tags).to.eql(postData[100].tags);\r",
+											"    pm.expect(jsonData.posts[100].reactions.likes).to.eql(postData[100].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[100].reactions.dislikes).to.eql(postData[100].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[100].views).to.eql(postData[100].views);\r",
+											"    pm.expect(jsonData.posts[100].userId).to.eql(postData[100].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?skip=0&limit=0",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "select",
+											"value": "title,body",
+											"disabled": true
+										},
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "0"
+										},
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add a new post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    required: ['id', 'title', 'body', 'userId']\r",
+											"}\r",
+											"\r",
+											"pm.collectionVariables.set(\"newPost\", JSON.stringify(jsonData));\r",
+											"const newPost = JSON.parse(pm.collectionVariables.get('newPost'));\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 201\", () => {\r",
+											"    pm.response.to.have.status(201)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response containts required properties\", () => {\r",
+											"    const props = ['id', 'title', 'body', 'userId'];\r",
+											"    props.forEach((data) => pm.expect(jsonData).to.have.property(data))\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.id).to.eql(newPost.id);\r",
+											"    pm.expect(jsonData.title).to.eql(newPost.title);\r",
+											"    pm.expect(jsonData.body).to.eql(newPost.body);\r",
+											"    pm.expect(jsonData.userId).to.eql(newPost.userId);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"I am in love with someone.\",\r\n    \"body\": \"lorem ipsume dolor sit amet\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        tags: {\r",
+											"            type: \"array\"\r",
+											"        },\r",
+											"        reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"                likes: {\r",
+											"                    type: 'integer'\r",
+											"                },\r",
+											"                dislikes: {\r",
+											"                    type: 'integer'\r",
+											"                }\r",
+											"            }\r",
+											"        }\r",
+											"    },\r",
+											"    required: ['id', 'title', 'body', 'userId', 'tags', 'reactions']\r",
+											"}\r",
+											"\r",
+											"\r",
+											"const postId = JSON.parse(pm.collectionVariables.get('postId'));\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response contains required properties\", () => {\r",
+											"    const props = ['id', 'title', 'body', 'userId'];\r",
+											"    props.forEach((data) => pm.expect(jsonData).to.have.property(data))\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.id).to.equal(postId);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const limit = 251;\r",
+											"const randomId = Math.floor(Math.random() * limit) + 1;\r",
+											"pm.collectionVariables.set(\"postId\", randomId);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"I am in love with someone.\",\r\n    \"body\": \"lorem ipsume dolor sit amet\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/:id",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{postId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const deleteSchema = {\r",
+											"    type: 'object',\r",
+											"    properties: {\r",
+											"        id: { type: 'number' },\r",
+											"        title: { type: 'string' },\r",
+											"        body: {type: 'string' },\r",
+											"        tags: { type: 'array', items: { type: 'string' } },\r",
+											"        reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"                likes: { type: 'number' },\r",
+											"                dislikes: { type: 'number' }\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"            additionalProperties: false\r",
+											"        },\r",
+											"        views: { type: 'number' },\r",
+											"        userId: { type: 'number' },\r",
+											"        isDeleted: { type: 'boolean' },\r",
+											"        deletedOn: { type: 'string', format: 'date-time' }\r",
+											"        },\r",
+											"    required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId', 'isDeleted', 'deletedOn'],\r",
+											"    additionalProperties: false\r",
+											"};\r",
+											"\r",
+											"const postId = JSON.parse(pm.collectionVariables.get(\"postId\"));\r",
+											"const posts = JSON.parse(pm.collectionVariables.get(\"allPosts\"));\r",
+											"const validate = ajv.compile(deleteSchema);\r",
+											"\r",
+											"\r",
+											"pm.test(\"Status code is 200\", () => {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Check if the post is deleted\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    if(!valid) {\r",
+											"        console.log(validate.errors);\r",
+											"    }\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response containts required properties\", () => {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId', 'isDeleted', 'deletedOn'];\r",
+											"    props.forEach((data) => pm.expect(jsonData).to.have.property(data))\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.id).to.eql(posts[postId - 1].id);\r",
+											"    pm.expect(jsonData.title).to.eql(posts[postId -1].title);\r",
+											"    pm.expect(jsonData.body).to.eql(posts[postId - 1].body);\r",
+											"    pm.expect(jsonData.userId).to.eql(posts[postId -1 ].userId);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/:id",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{postId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search posts with valid keyword",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const searchSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"            additionalProperties: false,\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const query = pm.collectionVariables.get('query');\r",
+											"\r",
+											"const validate = ajv.compile(searchSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"    pm.expect(jsonData.posts.length, 'No posts available').to.be.greaterThan(0);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].body).to.include(query);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/search?q={{query}}",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "{{query}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Negative",
+					"item": [
+						{
+							"name": "Invalid string limit params",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"  additionalProperties: true\r",
+											"};\r",
+											"\r",
+											"pm.test('Status code is 400', () => {\r",
+											"  pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid 'limit' - must be a number\")\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[100].id).to.eql(postData[100].id);\r",
+											"    pm.expect(jsonData.posts[100].title).to.eql(postData[100].title);\r",
+											"    pm.expect(jsonData.posts[100].body).to.eql(postData[100].body);\r",
+											"    pm.expect(jsonData.posts[100].tags).to.eql(postData[100].tags);\r",
+											"    pm.expect(jsonData.posts[100].reactions.likes).to.eql(postData[100].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[100].reactions.dislikes).to.eql(postData[100].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[100].views).to.eql(postData[100].views);\r",
+											"    pm.expect(jsonData.posts[100].userId).to.eql(postData[100].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?limit=abc",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "abc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request extremely high limit (e.g., 1000)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const postData = JSON.parse(pm.collectionVariables.get('allPosts'));\r",
+											"\r",
+											"const validate = ajv.compile(postsSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"    pm.expect(jsonData.posts.length, 'No posts available').to.be.greaterThan(0);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].id).to.eql(postData[0].id);\r",
+											"    pm.expect(jsonData.posts[0].title).to.eql(postData[0].title);\r",
+											"    pm.expect(jsonData.posts[0].body).to.eql(postData[0].body);\r",
+											"    pm.expect(jsonData.posts[0].tags).to.eql(postData[0].tags);\r",
+											"    pm.expect(jsonData.posts[0].reactions.likes).to.eql(postData[0].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[0].reactions.dislikes).to.eql(postData[0].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[0].views).to.eql(postData[0].views);\r",
+											"    pm.expect(jsonData.posts[0].userId).to.eql(postData[0].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?limit=1000",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "1000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request extremely high skip (e.g., 1000)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const postData = JSON.parse(pm.collectionVariables.get('allPosts'));\r",
+											"\r",
+											"const validate = ajv.compile(postsSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"        props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"    } else {\r",
+											"        pm.expect(jsonData.posts, 'Expected posts to be an empty array').to.be.a('array').that.is.empty;\r",
+											"    }\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].id).to.eql(postData[0].id);\r",
+											"    pm.expect(jsonData.posts[0].title).to.eql(postData[0].title);\r",
+											"    pm.expect(jsonData.posts[0].body).to.eql(postData[0].body);\r",
+											"    pm.expect(jsonData.posts[0].tags).to.eql(postData[0].tags);\r",
+											"    pm.expect(jsonData.posts[0].reactions.likes).to.eql(postData[0].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[0].reactions.dislikes).to.eql(postData[0].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[0].views).to.eql(postData[0].views);\r",
+											"    pm.expect(jsonData.posts[0].userId).to.eql(postData[0].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?skip=10000",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "10000"
+										},
+										{
+											"key": "limit",
+											"value": "1000",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid skip param negative",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"\r",
+											"pm.test('API should return 400 when skip is negative', function () {\r",
+											"  pm.response.to.have.status(400); \r",
+											"  pm.response.to.have.body('Invalid query parameter: skip should not be negative');\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?skip=-1",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "-1"
+										},
+										{
+											"key": "limit",
+											"value": "1000",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid skip string params",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const postsSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"  additionalProperties: true\r",
+											"};\r",
+											"\r",
+											"pm.test('Status code is 400', () => {\r",
+											"  pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid 'skip' - must be a number\")\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[100].id).to.eql(postData[100].id);\r",
+											"    pm.expect(jsonData.posts[100].title).to.eql(postData[100].title);\r",
+											"    pm.expect(jsonData.posts[100].body).to.eql(postData[100].body);\r",
+											"    pm.expect(jsonData.posts[100].tags).to.eql(postData[100].tags);\r",
+											"    pm.expect(jsonData.posts[100].reactions.likes).to.eql(postData[100].reactions.likes);\r",
+											"    pm.expect(jsonData.posts[100].reactions.dislikes).to.eql(postData[100].reactions.dislikes);\r",
+											"    pm.expect(jsonData.posts[100].views).to.eql(postData[100].views);\r",
+											"    pm.expect(jsonData.posts[100].userId).to.eql(postData[100].userId);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}posts?skip=abc",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "abc",
+											"disabled": true
+										},
+										{
+											"key": "skip",
+											"value": "abc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search posts with valid keyword Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const searchSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"            additionalProperties: false,\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const query = pm.collectionVariables.get('query');\r",
+											"\r",
+											"const validate = ajv.compile(searchSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"    pm.expect(jsonData.posts, 'Expected posts to be an empty array').to.be.a('array').that.is.empty;\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].body).to.include(query);\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/search?q=zzzzz",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "zzzzz"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search query param empty string or value",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const searchSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"            additionalProperties: false,\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const query = pm.collectionVariables.get('query');\r",
+											"\r",
+											"const validate = ajv.compile(searchSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"   pm.expect(jsonData.posts, 'Expected posts to be an empty array').to.be.a('array').that.is.empty;\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test('Response values as expected', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    pm.expect(jsonData.posts[0].body).to.include(\"\");\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/search?q=",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Unexpected query param",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const searchSchema = {\r",
+											"  type: 'object',\r",
+											"  properties: {\r",
+											"    posts: {\r",
+											"      type: 'array',\r",
+											"      items: {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"          id: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          title: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          body: {\r",
+											"            type: 'string',\r",
+											"          },\r",
+											"          tags: {\r",
+											"            type: 'array',\r",
+											"            items: {\r",
+											"              type: 'string',\r",
+											"            },\r",
+											"          },\r",
+											"          reactions: {\r",
+											"            type: 'object',\r",
+											"            properties: {\r",
+											"              likes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"              dislikes: {\r",
+											"                type: 'integer',\r",
+											"              },\r",
+											"            },\r",
+											"            required: ['likes', 'dislikes'],\r",
+											"            additionalProperties: false,\r",
+											"          },\r",
+											"          views: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"          userId: {\r",
+											"            type: 'integer',\r",
+											"          },\r",
+											"        },\r",
+											"        required: ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'],\r",
+											"        additionalProperties: false,\r",
+											"      },\r",
+											"    },\r",
+											"    total: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    skip: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"    limit: {\r",
+											"      type: 'integer',\r",
+											"    },\r",
+											"  },\r",
+											"  required: ['posts', 'total', 'skip', 'limit'],\r",
+											"};\r",
+											"\r",
+											"pm.collectionVariables.set('allPosts', JSON.stringify(jsonData.posts));\r",
+											"const query = pm.collectionVariables.get('query');\r",
+											"\r",
+											"const validate = ajv.compile(searchSchema);\r",
+											"\r",
+											"pm.test('Status code is 200', () => {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test('Response schema should match the expected format', () => {\r",
+											"  const valid = validate(jsonData);\r",
+											"  pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test('Response contains required properties', () => {\r",
+											"  const props = ['posts', 'total', 'skip', 'limit'];\r",
+											"  props.forEach((data) => pm.expect(jsonData).to.have.property(data));\r",
+											"});\r",
+											"\r",
+											"pm.test('The post data response contains the required properties.', () => {\r",
+											"  if (jsonData.posts && jsonData.posts.length > 0) {\r",
+											"    const props = ['id', 'title', 'body', 'tags', 'reactions', 'views', 'userId'];\r",
+											"    jsonData.posts.forEach((post) => {\r",
+											"      props.forEach((data) => pm.expect(post).to.have.property(data));\r",
+											"    });\r",
+											"  } else {\r",
+											"   pm.expect(jsonData.posts, 'Expected posts to be an empty array').to.be.a('array').that.is.empty;\r",
+											"  }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/search?keyword=ABC",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"search"
+									],
+									"query": [
+										{
+											"key": "keyword",
+											"value": "ABC"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Valid post without login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response containts required properties\", () => {\r",
+											"   pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"User id\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"I am in love with someone.\",\r\n    \"body\": \"lorem ipsume dolor sit amet\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add a new post without title",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"body\": \"lorem ipsume dolor sit amet\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add a new post without body",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add a new post with empty payload",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response containts required properties\", () => {\r",
+											"   pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"required\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Title exceeds max length",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify API request is valid format",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response containts required properties\", () => {\r",
+											"   pm.expect(jsonData).to.have.property(\"message\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.include(\"required\")\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "html"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/add",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"add"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post not found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 404\", () => {\r",
+											"    pm.response.to.have.status(404)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    pm.expect(jsonData).to.have.property('message');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Post with id '9999' not found\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const limit = 251;\r",
+											"const randomId = Math.floor(Math.random() * limit) + 1;\r",
+											"pm.collectionVariables.set(\"postId\", randomId);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/9999",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"9999"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid ID format post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    pm.expect(jsonData).to.have.property('message');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid post id 'abc'\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const limit = 251;\r",
+											"const randomId = Math.floor(Math.random() * limit) + 1;\r",
+											"pm.collectionVariables.set(\"postId\", randomId);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/abc",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"abc"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Title exceeds max length",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv();\r",
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"const createPostSchema = {\r",
+											"    type: \"object\",\r",
+											"    properties: {\r",
+											"        id: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"        title: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        body: {\r",
+											"            type: \"string\"\r",
+											"        },\r",
+											"        userId: {\r",
+											"            type: \"integer\"\r",
+											"        },\r",
+											"    },\r",
+											"    additionalProperties: true\r",
+											"}\r",
+											"\r",
+											"const validate = ajv.compile(createPostSchema);\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    const valid = validate(jsonData)\r",
+											"    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+											"});\r",
+											"\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\": \"Lorem ipsum\",\r\n    \"body\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.\",\r\n    \"userId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "text"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/:id",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{postId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Post not found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 404\", () => {\r",
+											"    pm.response.to.have.status(404)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    pm.expect(jsonData).to.have.property('message');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Post with id '9999' not found\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/9999",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"9999"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Invalid ID format post",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", () => {\r",
+											"    pm.response.to.have.status(400)\r",
+											"});\r",
+											"\r",
+											"pm.test('Content-Type is application/json', () => {\r",
+											"  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+											"});\r",
+											"\r",
+											"pm.test('Response is valid JSON', () => {\r",
+											"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response schema should match the expected format\", () => {\r",
+											"    pm.expect(jsonData).to.have.property('message');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response values as expected\", () => {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Invalid post id 'abc'\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is under 200ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.below(300);\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}posts/abc",
+									"host": [
+										"{{baseUrl}}posts"
+									],
+									"path": [
+										"abc"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://dummyjson.com/",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "postId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "userPartial",
+			"value": ""
+		},
+		{
+			"key": "allPosts",
+			"value": ""
+		},
+		{
+			"key": "userLogin",
+			"value": ""
+		},
+		{
+			"key": "invalidToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "newPost",
+			"value": ""
+		},
+		{
+			"key": "query",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

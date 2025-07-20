@@ -1,0 +1,47 @@
+[
+  {
+    "key": "baseUrl",
+    "value": "https://dummyjson.com/",
+    "type": "string"
+  },
+  {
+    "key": "userId",
+    "value": "1",
+    "type": "string"
+  },
+  {
+    "key": "postId",
+    "value": "",
+    "type": "string"
+  },
+  {
+    "key": "accessToken",
+    "value": ""
+  },
+  {
+    "key": "userPartial",
+    "value": ""
+  },
+  {
+    "key": "allPosts",
+    "value": ""
+  },
+  {
+    "key": "userLogin",
+    "value": ""
+  },
+  {
+    "key": "invalidToken",
+    "value": "",
+    "type": "string"
+  },
+  {
+    "key": "newPost",
+    "value": ""
+  },
+  {
+    "key": "query",
+    "value": "",
+    "type": "string"
+  }
+]

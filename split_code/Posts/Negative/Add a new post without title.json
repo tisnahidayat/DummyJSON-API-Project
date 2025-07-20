@@ -1,0 +1,83 @@
+{
+  "name": "Add a new post without title",
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "const Ajv = require('ajv');\r",
+          "const ajv = new Ajv();\r",
+          "const jsonData = pm.response.json();\r",
+          "\r",
+          "const createPostSchema = {\r",
+          "    type: \"object\",\r",
+          "    properties: {\r",
+          "        id: {\r",
+          "            type: \"integer\"\r",
+          "        },\r",
+          "        title: {\r",
+          "            type: \"string\"\r",
+          "        },\r",
+          "        body: {\r",
+          "            type: \"string\"\r",
+          "        },\r",
+          "        userId: {\r",
+          "            type: \"integer\"\r",
+          "        },\r",
+          "    },\r",
+          "    additionalProperties: true\r",
+          "}\r",
+          "\r",
+          "const validate = ajv.compile(createPostSchema);\r",
+          "\r",
+          "pm.test(\"Status code is 400\", () => {\r",
+          "    pm.response.to.have.status(400)\r",
+          "});\r",
+          "\r",
+          "pm.test('Content-Type is application/json', () => {\r",
+          "  pm.response.to.have.header('Content-Type', 'application/json; charset=utf-8');\r",
+          "});\r",
+          "\r",
+          "pm.test('Response is valid JSON', () => {\r",
+          "  pm.expect(() => pm.response.json()).to.not.throw();\r",
+          "});\r",
+          "\r",
+          "pm.test(\"Response schema should match the expected format\", () => {\r",
+          "    const valid = validate(jsonData)\r",
+          "    pm.expect(valid, JSON.stringify(validate.errors)).to.be.true;\r",
+          "});\r",
+          "\r",
+          "\r",
+          "pm.test(\"Response time is under 200ms\", () => {\r",
+          "    pm.expect(pm.response.responseTime).to.below(300);\r",
+          "})"
+        ],
+        "type": "text/javascript",
+        "packages": {}
+      }
+    }
+  ],
+  "request": {
+    "method": "POST",
+    "header": [],
+    "body": {
+      "mode": "raw",
+      "raw": "{\r\n    \"body\": \"lorem ipsume dolor sit amet\",\r\n    \"userId\": 1\r\n}",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      }
+    },
+    "url": {
+      "raw": "{{baseUrl}}posts/add",
+      "host": [
+        "{{baseUrl}}posts"
+      ],
+      "path": [
+        "add"
+      ]
+    }
+  },
+  "response": []
+}
