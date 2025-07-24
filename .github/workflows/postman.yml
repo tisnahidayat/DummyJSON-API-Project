@@ -4,32 +4,41 @@ on:
   push:
   pull_request:
 
-
 jobs:
   automated-api-tests:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+
     - name: Install Postman CLI
       run: |
         powershell.exe -NoProfile -InputFormat None -ExecutionPolicy AllSigned -Command "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://dl-cli.pstmn.io/install/win64.ps1'))"
+
     - name: Login to Postman CLI
       run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+
     - name: Run API tests
+      id: postman_tests
       continue-on-error: true
       run: |
         postman collection run "26429971-040c7827-1f9e-49b2-ab36-6e8367565ad6"
+
     - name: Log all detected bugs
       if: ${{ failure() }}
       run: |
-        echo "Bug Detected: skip=-1 should return 400 but returned ${failure()}" >> bug_log.txt
-        echo "Bug Detected: Add a new post without title should return 400 but returned ${failure()}" >> bug_log.txt
-        echo "Bug Detected: Add a new post without body should return 400 but returned ${failure()}" >> bug_log.txt
-        echo "Bug Detected: Title exceeds max length in add a new posts hould return 400 but returned ${failure()}" >> bug_log.txt
-        echo "Bug Detected: Title exceeds max length in update post should return 400 but returned ${failure()}" >> bug_log.txt
+        echo "Bug Detected: skip=-1 should return 400 but returned failure" >> bug_log.txt
+        echo "Bug Detected: Add a new post without title should return 400 but returned failure" >> bug_log.txt
+        echo "Bug Detected: Add a new post without body should return 400 but returned failure" >> bug_log.txt
+        echo "Bug Detected: Title exceeds max length in add a new post should return 400 but returned failure" >> bug_log.txt
+        echo "Bug Detected: Title exceeds max length in update post should return 400 but returned failure" >> bug_log.txt
         echo "Test failed for the following reason: ${{ steps.postman_tests.outcome }}" >> bug_log.txt  
+
+    - name: Show bug log contents
+      if: always()
+      run: type bug_log.txt
+
     - name: Upload bug log artifact
-      if: ${{ failure() }}
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: bug-log
